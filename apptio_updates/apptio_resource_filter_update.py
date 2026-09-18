@@ -1,22 +1,23 @@
 import os
 import requests
 import json
+import csv
 
-# Location of view file downloaded from Apptio
-filepath = os.getenv("filepath") + "bow.json"
+filter_update = []
 
-# New filters as dictionary
-new_filter = [{
-      "field": "vendor_account_identifier",
-      "comparator": "!=",
-      "value": "f1b37eda-44be-419e-bb73-1d7c746af83a",
-    },
-{
-      "field": "vendor_account_identifier",
-      "comparator": "!=",
-      "value": "aa9e6f9d-d143-4c79-a7fa-4fb537cbbbc7",
-    }
-]
+# Open the CSV file in read mode ('r')
+with open(os.getenv("filepath") + "aspfilter.csv", mode='r', newline='', encoding="utf-8-sig") as file:
+    # Create a CSV reader object
+    dict_reader = csv.DictReader(file)
+
+    filter_update = list(dict_reader)
+
+    #print(filter_update)
+
+filepath = os.getenv("filepath") + "maldynamic.json"
+#print(filepath)
+
+
 
 # 1. Open and load the JSON file
 with open(filepath, "r") as file:
@@ -34,7 +35,7 @@ for _ , value in data.items():
         derivedOrgUnitIDs = field.get("derivedOrgUnitIDs")
         sharedWithOrganization = field.get("sharedWithOrganization")            
         filters = field.get("filters")
-        filters.extend(new_filter)
+        filters.extend(filter_update)
         sharedOrgUnitIDs = field.get("sharedOrgUnitIDs")
         ownerEmail = field.get("ownerEmail")
         
@@ -65,3 +66,4 @@ for _ , value in data.items():
 
         # 7. Print result of each iteration
         print(response.text)
+
